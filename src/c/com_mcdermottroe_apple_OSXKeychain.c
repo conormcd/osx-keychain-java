@@ -100,6 +100,55 @@ void jstring_unpacked_free(jstring_unpacked* jsu) {
 	}
 }
 
+/* Implementation of OSXKeychain.findGenericPassword(). See the Java docs for
+ * explanations of the parameters.
+ */
+JNIEXPORT jstring JNICALL Java_com_mcdermottroe_apple_OSXKeychain__1findGenericPassword(JNIEnv* env, jobject obj, jstring serviceName, jstring accountName) {
+	OSStatus status;
+	jstring_unpacked service_name;
+	jstring_unpacked account_name;
+	jstring result;
+
+	/* Buffer for the return from SecKeychainFindGenericPassword. */
+	void* password;
+	UInt32 password_length;
+
+	/* Unpack the params. */
+	jstring_unpack(env, serviceName, &service_name);
+	jstring_unpack(env, accountName, &account_name);
+
+	/* Query the keychain. */
+	status = SecKeychainSetPreferenceDomain(kSecPreferencesDomainUser);
+	if (status != errSecSuccess) {
+		throw_OSXKeychainException("Failed to set preference domain");
+		return NULL;
+	}
+	status = SecKeychainFindGenericPassword(
+		NULL,
+		service_name.len,
+		service_name.str,
+		account_name.len,
+		account_name.str,
+		&password_length,
+		&password,
+		NULL
+	);
+	if (status != errSecSuccess) {
+		throw_OSXKeychainException("SecKeychainFindGenericPassword failed");
+	}
+	((char*)password)[password_length] = 0;
+
+	/* Create the return value. */
+	result = (*env)->NewStringUTF(env, password);
+
+	/* Clean up. */
+	SecKeychainItemFreeContent(NULL, password);
+	jstring_unpacked_free(&service_name);
+	jstring_unpacked_free(&account_name);
+
+	return result;
+}
+
 /* Implementation of OSXKeychain.findInternetPassword(). See the Java docs for
  * explanations of the parameters.
  */

@@ -67,6 +67,20 @@ public class OSXKeychain {
 		return instance;
 	}
 
+	/** See Java_com_mcdermottroe_apple_OSXKeychain__1findGenericPassword for
+	 *	the implementation of this and use {@link #findGenericPassword(String,
+	 *	String)} to call this.
+	 *
+	 *	@param	serviceName		The value which should be passed as the
+	 *							serviceName parameter to
+	 *							SecKeychainFindGenericPassword.
+	 *	@param	accountName		The value for the accountName parameter to
+	 *							SecKeychainFindGenericPassword.
+	 *	@return					The password which matches the details supplied.
+	 */
+	public String findGenericPassword(String serviceName, String accountName) {
+		return _findGenericPassword(serviceName, accountName);
+	}
 
 	/** Find an Internet Password in the keychain.
 	 *
@@ -86,6 +100,19 @@ public class OSXKeychain {
 	public String findInternetPassword(String serverName, String securityDomain, String accountName, String path, int port) {
 		return _findInternetPassword(serverName, securityDomain, accountName, path, port);
 	}
+
+	/** See Java_com_mcdermottroe_apple_OSXKeychain__1findGenericPassword for
+	 *	the implementation of this and use {@link #findGenericPassword(String,
+	 *	String)} to call this.
+	 *
+	 *	@param	serviceName		The value which should be passed as the
+	 *							serviceName parameter to
+	 *							SecKeychainFindGenericPassword.
+	 *	@param	accountName		The value for the accountName parameter to
+	 *							SecKeychainFindGenericPassword.
+	 *	@return					The password which matches the details supplied.
+	 */
+	private native String _findGenericPassword(String serviceName, String accountName);
 
 	/** See Java_com_mcdermottroe_apple_OSXKeychain__1findInternetPassword for
 	 *	the implementation of this and use {@link #findInternetPassword(String,
