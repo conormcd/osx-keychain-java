@@ -28,7 +28,7 @@
 
 #include "com_mcdermottroe_apple_OSXKeychain.h"
 
-#define throw_OSXKeychainException(message) throw_exception(env, "com/mcdermottroe/apple/OSXKeychainException", message)
+#define OSXKeychainException "com/mcdermottroe/apple/OSXKeychainException"
 
 /* A simplified structure for dealing with jstring objects. Use jstring_unpack
  * and jstring_unpacked_free to manage these.
@@ -48,6 +48,16 @@ typedef struct {
 void throw_exception(JNIEnv* env, const char* exceptionClass, const char* message) {
 	jclass cls = (*env)->FindClass(env, exceptionClass);
 	(*env)->ThrowNew(env, cls, message);
+}
+
+void throw_osxkeychainexception(JNIEnv* env, OSStatus status) {
+	CFStringRef errorMessage = SecCopyErrorMessageString(status, NULL);
+	throw_exception(
+		env,
+		OSXKeychainException,
+		CFStringGetCStringPtr(errorMessage, kCFStringEncodingMacRoman)
+	);
+	CFRelease(errorMessage);
 }
 
 /* Unpack the data from a jstring and put it in a jstring_unpacked.
@@ -79,7 +89,11 @@ void jstring_unpack(JNIEnv* env, jstring js, jstring_unpacked* ret) {
 	ret->str = (char*)calloc(ret->len + 1, sizeof(char));
 	if (ret->str == NULL) {
 		ret->len = 0;
-		throw_OSXKeychainException("Failed to allocate memory to unpack a jstring.");
+		throw_exception(
+			env,
+			OSXKeychainException,
+			"Failed to allocate memory to unpack a jstring."
+		);
 		return;
 	}
 
@@ -98,6 +112,42 @@ void jstring_unpacked_free(jstring_unpacked* jsu) {
 		jsu->len = 0;
 		jsu->str = NULL;
 	}
+}
+
+/* Implementation of OSXKeychain.addGenericPassword(). See the Java docs for
+ * explanations of the parameters.
+ */
+JNIEXPORT void JNICALL Java_com_mcdermottroe_apple_OSXKeychain__1addGenericPassword(JNIEnv* env, jobject obj, jstring serviceName, jstring accountName, jstring password) {
+	OSStatus status;
+	jstring_unpacked service_name;
+	jstring_unpacked account_name;
+	jstring_unpacked service_password;
+
+	/* Unpack the params. */
+	jstring_unpack(env, serviceName, &service_name);
+	jstring_unpack(env, accountName, &account_name);
+	jstring_unpack(env, password, &service_password);
+
+	/* Add the details to the keychain. */
+	status = SecKeychainAddGenericPassword(
+		NULL,
+		service_name.len,
+		service_name.str,
+		account_name.len,
+		account_name.str,
+		service_password.len,
+		service_password.str,
+		NULL
+	);
+	if (status != errSecSuccess) {
+		throw_osxkeychainexception(env, status);
+		return;
+	}
+
+	/* Clean up. */
+	jstring_unpacked_free(&service_name);
+	jstring_unpacked_free(&account_name);
+	jstring_unpacked_free(&service_password);
 }
 
 /* Implementation of OSXKeychain.findGenericPassword(). See the Java docs for
@@ -120,7 +170,7 @@ JNIEXPORT jstring JNICALL Java_com_mcdermottroe_apple_OSXKeychain__1findGenericP
 	/* Query the keychain. */
 	status = SecKeychainSetPreferenceDomain(kSecPreferencesDomainUser);
 	if (status != errSecSuccess) {
-		throw_OSXKeychainException("Failed to set preference domain");
+		throw_osxkeychainexception(env, status);
 		return NULL;
 	}
 	status = SecKeychainFindGenericPassword(
@@ -134,7 +184,7 @@ JNIEXPORT jstring JNICALL Java_com_mcdermottroe_apple_OSXKeychain__1findGenericP
 		NULL
 	);
 	if (status != errSecSuccess) {
-		throw_OSXKeychainException("SecKeychainFindGenericPassword failed");
+		throw_osxkeychainexception(env, status);
 	}
 	((char*)password)[password_length] = 0;
 
@@ -175,7 +225,7 @@ JNIEXPORT jstring JNICALL Java_com_mcdermottroe_apple_OSXKeychain__1findInternet
 	/* Query the keychain */
 	status = SecKeychainSetPreferenceDomain(kSecPreferencesDomainUser);
 	if (status != errSecSuccess) {
-		throw_OSXKeychainException("Failed to set preference domain");
+		throw_osxkeychainexception(env, status);
 		return NULL;
 	}
 	status = SecKeychainFindInternetPassword(
@@ -196,7 +246,7 @@ JNIEXPORT jstring JNICALL Java_com_mcdermottroe_apple_OSXKeychain__1findInternet
 		NULL
 	);
 	if (status != errSecSuccess) {
-		throw_OSXKeychainException("SecKeychainFindInternetPassword failed");
+		throw_osxkeychainexception(env, status);
 	}
 	((char*)password)[password_length] = 0;
 

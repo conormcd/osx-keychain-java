@@ -44,6 +44,8 @@
 		<exec executable="clang" dir="src/c">
 			<arg value="-dynamiclib" />
 			<arg value="-framework" />
+			<arg value="CoreFoundation" />
+			<arg value="-framework" />
 			<arg value="JavaVM" />
 			<arg value="-framework" />
 			<arg value="Security" />

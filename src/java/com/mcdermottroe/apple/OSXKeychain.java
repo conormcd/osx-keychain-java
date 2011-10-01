@@ -68,6 +68,22 @@ public class OSXKeychain {
 		return instance;
 	}
 
+	/** Add a non-internet password to the keychain.
+	 *
+	 *	@param	serviceName				The name of the service the password is
+	 *									for.
+	 *	@param	accountName				The account name/username for the
+	 *									service.
+	 *	@param	password				The password for the service.
+	 *	@throws OSXKeychainException	If an error occurs when communicating
+	 *									with the OS X keychain.
+	 */
+	public void addGenericPassword(String serviceName, String accountName, String password)
+	throws OSXKeychainException
+	{
+		_addGenericPassword(serviceName, accountName, password);
+	}
+
 	/** Find a password in the keychain which is not an Internet Password.
 	 *
 	 *	@param	serviceName				The name of the service the password is
@@ -162,6 +178,25 @@ public class OSXKeychain {
 	/* ************************* */
 	/* JNI stuff from here down. */
 	/* ************************* */
+
+	/** See Java_com_mcdermottroe_apple_OSXKeychain__1addGenericPassword for
+	 *	the implementation of this and use {@link #addGenericPassword(String,
+	 *	String, String)} to call this.
+	 *
+	 *	@param	serviceName				The value which should be passed as the
+	 *									serviceName parameter to
+	 *									SecKeychainAddGenericPassword.
+	 *	@param	accountName				The value which should be passed as the
+	 *									accountName parameter to
+	 *									SecKeychainAddGenericPassword.
+	 *	@param	password				The value which should be passed as the
+	 *									password parameter to
+	 *									SecKeychainAddGenericPassword.
+	 *	@throws	OSXKeychainException	If an error occurs when communicating
+	 *									with the OS X keychain.
+	 */
+	private native void _addGenericPassword(String serviceName, String accountName, String password)
+	throws OSXKeychainException;
 
 	/** See Java_com_mcdermottroe_apple_OSXKeychain__1findGenericPassword for
 	 *	the implementation of this and use {@link #findGenericPassword(String,
