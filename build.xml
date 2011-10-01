@@ -34,11 +34,13 @@
 		<javac destdir="lib" includeantruntime="false" debug="true">
 			<src path="src/java" />
 		</javac>
+	</target>
+	<target name="build-javah" depends="build-java">
 		<javah destdir="src/c" classpath="lib">
 			<class name="com.mcdermottroe.apple.OSXKeychain" />
 		</javah>
 	</target>
-	<target name="build-c" depends="build-dest,build-java">
+	<target name="build-c" depends="build-dest,build-javah">
 		<exec executable="clang" dir="src/c">
 			<arg value="-dynamiclib" />
 			<arg value="-framework" />
