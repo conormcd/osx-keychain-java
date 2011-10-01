@@ -31,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 
 /** An interface to the OS X Keychain. The names of functions and parameters
  *	will mostly match the functions listed in the <a href="http://developer.apple.com/library/mac/#documentation/Security/Reference/keychainservices/Reference/reference.html">Keychain Services Reference</a>.
@@ -67,71 +68,142 @@ public class OSXKeychain {
 		return instance;
 	}
 
-	/** See Java_com_mcdermottroe_apple_OSXKeychain__1findGenericPassword for
-	 *	the implementation of this and use {@link #findGenericPassword(String,
-	 *	String)} to call this.
+	/** Find a password in the keychain which is not an Internet Password.
 	 *
-	 *	@param	serviceName		The value which should be passed as the
-	 *							serviceName parameter to
-	 *							SecKeychainFindGenericPassword.
-	 *	@param	accountName		The value for the accountName parameter to
-	 *							SecKeychainFindGenericPassword.
-	 *	@return					The password which matches the details supplied.
+	 *	@param	serviceName				The name of the service the password is
+	 *									for.
+	 *	@param	accountName				The account name/username for the
+	 *									service.
+	 *	@return							The password which matches the details
+	 *									supplied.
+	 *	@throws	OSXKeychainException	If an error occurs when communicating
+	 *									with the OS X keychain.
 	 */
-	public String findGenericPassword(String serviceName, String accountName) {
+	public String findGenericPassword(String serviceName, String accountName)
+	throws OSXKeychainException
+	{
 		return _findGenericPassword(serviceName, accountName);
+	}
+
+	/** Find an Internet Password in the keychain. This is a convenience method
+	 *	wrapping {@link #findInternetPassword(String,String,String,String,int)}
+	 *	for one of the most common cases.
+	 *
+	 *	@param	url						The URL of which requires the password.
+	 *	@param	accountName				The account name/username. e.g.
+	 *									"conormcd".
+	 *	@return							The first password which matches the
+	 *									details supplied.
+	 *	@throws	OSXKeychainException	If an error occurs when communicating
+	 *									with the OS X keychain.
+	 */
+	public String findInternetPassword(URL url, String accountName)
+	throws OSXKeychainException
+	{
+		String username = accountName;
+		if (username == null) {
+			username = url.getUserInfo();
+			if (username.indexOf(':') > 0) {
+				username = username.substring(0, username.indexOf(':'));
+			}
+		}
+		if (username == null) {
+			throw new OSXKeychainException("No account name supplied.");
+		}
+		return findInternetPassword(url.getHost(), username, url.getPath());
+	}
+
+	/** Find an Internet Password in the keychain. This is a convenience method
+	 *	wrapping {@link #findInternetPassword(String,String,String,String,int)}
+	 *	for one of the most common cases.
+	 *
+	 *	@param	serverName				The name of the server. e.g.
+	 *									"github.com".
+	 *	@param	accountName				The account name/username. e.g.
+	 *									"conormcd".
+	 *	@param	path					The path to the password protected
+	 *									resource on the server. e.g. "/login".
+	 *	@return							The first password which matches the
+	 *									details supplied.
+	 *	@throws	OSXKeychainException	If an error occurs when communicating
+	 *									with the OS X keychain.
+	 */
+	public String findInternetPassword(String serverName, String accountName, String path)
+	throws OSXKeychainException
+	{
+		return _findInternetPassword(serverName, null, accountName, path, 0);
 	}
 
 	/** Find an Internet Password in the keychain.
 	 *
-	 *	@param	serverName		The value which should be passed as the
-	 *							serverName parameter to
-	 *							SecKeychainFindInternetPassword.
-	 *	@param	securityDomain	This will be passed for the securityDomain
-	 *							parameter to SecKeychainFindInternetPassword.
-	 *	@param	accountName		The value for the accountName parameter to
-	 *							SecKeychainFindInternetPassword.
-	 *	@param	path			This will be passed as the path parameter to
-	 *							SecKeychainFindInternetPassword.
-	 *	@param	port			The port parameter value for
-	 *							SecKeychainFindInternetPassword.
-	 *	@return					The password which matches the details supplied.
+	 *	@param	serverName				The name of the server. e.g.
+	 *									"github.com".
+	 *	@param	securityDomain			The security domain which is needed for
+	 *									some protocols. Pass null if not
+	 *									needed.
+	 *	@param	accountName				The account name/username. e.g.
+	 *									"conormcd".
+	 *	@param	path					The path to the password protected
+	 *									resource on the server. e.g. "/login".
+	 *	@param	port					The port to connect to. Pass 0 if you
+	 *									want the first result for any entry
+	 *									matching the rest of the criteria.
+	 *	@return							The first password which matches the
+	 *									details supplied.
+	 *	@throws	OSXKeychainException	If an error occurs when communicating
+	 *									with the OS X keychain.
 	 */
-	public String findInternetPassword(String serverName, String securityDomain, String accountName, String path, int port) {
+	public String findInternetPassword(String serverName, String securityDomain, String accountName, String path, int port)
+	throws OSXKeychainException
+	{
 		return _findInternetPassword(serverName, securityDomain, accountName, path, port);
 	}
+
+	/* ************************* */
+	/* JNI stuff from here down. */
+	/* ************************* */
 
 	/** See Java_com_mcdermottroe_apple_OSXKeychain__1findGenericPassword for
 	 *	the implementation of this and use {@link #findGenericPassword(String,
 	 *	String)} to call this.
 	 *
-	 *	@param	serviceName		The value which should be passed as the
-	 *							serviceName parameter to
-	 *							SecKeychainFindGenericPassword.
-	 *	@param	accountName		The value for the accountName parameter to
-	 *							SecKeychainFindGenericPassword.
-	 *	@return					The password which matches the details supplied.
+	 *	@param	serviceName				The value which should be passed as the
+	 *									serviceName parameter to
+	 *									SecKeychainFindGenericPassword.
+	 *	@param	accountName				The value for the accountName parameter
+	 *									to SecKeychainFindGenericPassword.
+	 *	@return							The first password which matches the
+	 *									details supplied.
+	 *	@throws OSXKeychainException	If an error occurs when communicating
+	 *									with the OS X keychain.
 	 */
-	private native String _findGenericPassword(String serviceName, String accountName);
+	private native String _findGenericPassword(String serviceName, String accountName)
+	throws OSXKeychainException;
 
 	/** See Java_com_mcdermottroe_apple_OSXKeychain__1findInternetPassword for
 	 *	the implementation of this and use {@link #findInternetPassword(String,
 	 *	String, String, String, int)} to call this.
 	 *
-	 *	@param	serverName		The value which should be passed as the
-	 *							serverName parameter to
-	 *							SecKeychainFindInternetPassword.
-	 *	@param	securityDomain	This will be passed for the securityDomain
-	 *							parameter to SecKeychainFindInternetPassword.
-	 *	@param	accountName		The value for the accountName parameter to
-	 *							SecKeychainFindInternetPassword.
-	 *	@param	path			This will be passed as the path parameter to
-	 *							SecKeychainFindInternetPassword.
-	 *	@param	port			The port parameter value for
-	 *							SecKeychainFindInternetPassword.
-	 *	@return					The password which matches the details supplied.
+	 *	@param	serverName				The value which should be passed as the
+	 *									serverName parameter to
+	 *									SecKeychainFindInternetPassword.
+	 *	@param	securityDomain			This will be passed for the
+	 *									securityDomain parameter to
+	 *									SecKeychainFindInternetPassword.
+	 *	@param	accountName				The value for the accountName parameter
+	 *									to SecKeychainFindInternetPassword.
+	 *	@param	path					This will be passed as the path
+	 *									parameter to
+	 *									SecKeychainFindInternetPassword.
+	 *	@param	port					The port parameter value for
+	 *									SecKeychainFindInternetPassword.
+	 *	@return							The first password which matches the
+	 *									details supplied.
+	 *	@throws OSXKeychainException	If an error occurs when communicating
+	 *									with the OS X keychain.
 	 */
-	private native String _findInternetPassword(String serverName, String securityDomain, String accountName, String path, int port);
+	private native String _findInternetPassword(String serverName, String securityDomain, String accountName, String path, int port)
+	throws OSXKeychainException;
 
 	/** Load the shared object which contains the implementations for the native
 	 *	methods in this class.
