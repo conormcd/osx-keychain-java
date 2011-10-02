@@ -84,6 +84,32 @@ public class OSXKeychain {
 		_addGenericPassword(serviceName, accountName, password);
 	}
 
+	/** Add an intenet password to the keychain.
+	 *
+	 *	@param	serverName				The name of the server which the
+	 *									password is for.
+	 *	@param	securityDomain			The security domain which some
+	 *									protocols need.
+	 *	@param	accountName				The account name/username for the
+	 *									password.
+	 *	@param	path					The path on the server for which the
+	 *									credentials should be used.
+	 *	@param	port					Only return the password if connecting
+	 *									to this port.
+	 *	@param	protocol				Only return the password for this
+	 *									protocol.
+	 *	@param	authenticationType		The type of authentication the password
+	 *									is for.
+	 *	@param	password				The password to add.
+	 *	@throws OSXKeychainException	If an error occurs when communicating
+	 *									with the OS X keychain.
+	 */
+	public void addInternetPassword(String serverName, String securityDomain, String accountName, String path, int port, OSXKeychainProtocolType protocol, OSXKeychainAuthenticationType authenticationType, String password)
+	throws OSXKeychainException
+	{
+		_addInternetPassword(serverName, securityDomain, accountName, path, port, protocol.getValue(), authenticationType.getValue(), password);
+	}
+
 	/** Find a password in the keychain which is not an Internet Password.
 	 *
 	 *	@param	serviceName				The name of the service the password is
@@ -196,6 +222,13 @@ public class OSXKeychain {
 	 *									with the OS X keychain.
 	 */
 	private native void _addGenericPassword(String serviceName, String accountName, String password)
+	throws OSXKeychainException;
+
+	/** See Java_com_mcdermottroe_apple_OSXKeychain__1addInternetPassword for
+	 *	the implementation of this and use TODO
+	 *
+	 */
+	private native void _addInternetPassword(String serverName, String securityDomain, String accountName, String path, int port, int protocol, int authenticationType, String password)
 	throws OSXKeychainException;
 
 	/** See Java_com_mcdermottroe_apple_OSXKeychain__1findGenericPassword for

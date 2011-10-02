@@ -50,6 +50,12 @@ void throw_exception(JNIEnv* env, const char* exceptionClass, const char* messag
 	(*env)->ThrowNew(env, cls, message);
 }
 
+/* Shorthand for throwing an OSXKeychainException from an OSStatus.
+ *
+ * Parameters:
+ *	env		The JNI environment.
+ *	status	The non-error status returned from a keychain call.
+ */
 void throw_osxkeychainexception(JNIEnv* env, OSStatus status) {
 	CFStringRef errorMessage = SecCopyErrorMessageString(status, NULL);
 	throw_exception(
@@ -148,6 +154,55 @@ JNIEXPORT void JNICALL Java_com_mcdermottroe_apple_OSXKeychain__1addGenericPassw
 	jstring_unpacked_free(&service_name);
 	jstring_unpacked_free(&account_name);
 	jstring_unpacked_free(&service_password);
+}
+
+/* Implementation of OSXKeychain.addInternetPassword(). See the Java docs for
+ * explanation of the parameters.
+ */
+JNIEXPORT void JNICALL Java_com_mcdermottroe_apple_OSXKeychain__1addInternetPassword(JNIEnv* env, jobject obj, jstring serverName, jstring securityDomain, jstring accountName, jstring path, jint port, jint protocol, jint authenticationType, jstring password) {
+	OSStatus status;
+	jstring_unpacked server_name;
+	jstring_unpacked security_domain;
+	jstring_unpacked account_name;
+	jstring_unpacked server_path;
+	jstring_unpacked server_password;
+
+	/* Unpack the string params. */
+	jstring_unpack(env, serverName, &server_name);
+	jstring_unpack(env, securityDomain, &security_domain);
+	jstring_unpack(env, accountName, &account_name);
+	jstring_unpack(env, path, &server_path);
+	jstring_unpack(env, password, &server_password);
+
+	/* Add the details to the keychain. */
+	status = SecKeychainAddInternetPassword(
+		NULL,
+		server_name.len,
+		server_name.str,
+		security_domain.len,
+		security_domain.str,
+		account_name.len,
+		account_name.str,
+		server_path.len,
+		server_path.str,
+		port,
+		protocol,
+		authenticationType,
+		server_password.len,
+		server_password.str,
+		NULL
+	);
+	if (status != errSecSuccess) {
+		throw_osxkeychainexception(env, status);
+		return;
+	}
+
+	/* Clean up. */
+	jstring_unpacked_free(&server_name);
+	jstring_unpacked_free(&security_domain);
+	jstring_unpacked_free(&account_name);
+	jstring_unpacked_free(&server_path);
+	jstring_unpacked_free(&server_password);
 }
 
 /* Implementation of OSXKeychain.findGenericPassword(). See the Java docs for
