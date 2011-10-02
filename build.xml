@@ -30,7 +30,7 @@
 	<target name="build-dest">
 		<mkdir dir="lib" />
 	</target>
-	<target name="build-java" depends="build-dest">
+	<target name="build-java" depends="build-dest,codegen">
 		<javac destdir="lib" includeantruntime="false" debug="true">
 			<src path="src/java" />
 		</javac>
@@ -59,6 +59,26 @@
 		</exec>
 	</target>
 
+	<target name="codegen" depends="codegen-generate_enums">
+	</target>
+	<target name="codegen-generate_enums" depends="codegen-generate_enums-build">
+		<exec executable="src/c/codegen/generate_enums">
+			<arg value="src/java/com/mcdermottroe/apple/OSXKeychainAuthenticationType.java" />
+			<arg value="src/java/com/mcdermottroe/apple/OSXKeychainProtocolType.java" />
+		</exec>
+	</target>
+	<target name="codegen-generate_enums-build">
+		<exec executable="clang" dir="src/c/codegen">
+			<arg value="-framework" />
+			<arg value="Security" />
+			<arg value="-pedantic" />
+			<arg value="-Wall" />
+			<arg value="-o" />
+			<arg value="generate_enums" />
+			<arg value="generate_enums.c" />
+		</exec>
+	</target>
+
 	<target name="dist" depends="build">
 		<mkdir dir="dist" />
 		<jar destfile="dist/osxkeychain.jar" basedir="lib" index="true" />
@@ -66,7 +86,10 @@
 
 	<target name="clean">
 		<delete dir="lib" />
+		<delete file="src/c/codegen/generate_enums" />
 		<delete file="src/c/com_mcdermottroe_apple_OSXKeychain.h" />
+		<delete file="src/java/com/mcdermottroe/apple/OSXKeychainAuthenticationType.java" />
+		<delete file="src/java/com/mcdermottroe/apple/OSXKeychainProtocolType.java" />
 	</target>
 	<target name="distclean" depends="clean">
 		<delete dir="dist" />
