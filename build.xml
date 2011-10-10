@@ -90,8 +90,43 @@
 		<delete file="src/c/com_mcdermottroe_apple_OSXKeychain.h" />
 		<delete file="src/java/com/mcdermottroe/apple/OSXKeychainAuthenticationType.java" />
 		<delete file="src/java/com/mcdermottroe/apple/OSXKeychainProtocolType.java" />
+		<delete file="test/c/fakejni.o" />
+		<delete file="test/c/test" />
 	</target>
 	<target name="distclean" depends="clean">
 		<delete dir="dist" />
+	</target>
+
+	<target name="test" depends="test-c">
+	</target>
+	<target name="test-c" depends="test-c-build">
+		<exec executable="test" dir="test/c" failonerror="true">
+		</exec>
+	</target>
+	<target name="test-c-build" depends="test-c-build-fakejni,build-javah">
+		<exec executable="clang" dir="test/c">
+			<arg value="-framework" />
+			<arg value="CoreFoundation" />
+			<arg value="-framework" />
+			<arg value="Security" />
+			<arg value="-I" />
+			<arg value="/System/Library/Frameworks/JavaVM.framework/Versions/Current/Headers" />
+			<arg value="-pedantic" />
+			<arg value="-Wall" />
+			<arg value="-o" />
+			<arg value="test" />
+			<arg value="test.c" />
+			<arg value="fakejni.o" />
+		</exec>
+	</target>
+	<target name="test-c-build-fakejni">
+		<exec executable="clang" dir="test/c">
+			<arg value="-pedantic" />
+			<arg value="-Wall" />
+			<arg value="-c" />
+			<arg value="-o" />
+			<arg value="fakejni.o" />
+			<arg value="fakejni.c" />
+		</exec>
 	</target>
 </project>
