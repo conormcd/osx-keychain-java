@@ -236,6 +236,21 @@ public class OSXKeychain {
 		return _findInternetPassword(serverName, securityDomain, accountName, path, port);
 	}
 
+	/** Delete a generic password from the keychain.
+	 *
+	 *	@param	serviceName				The name of the service the password is
+	 *									for.
+	 *	@param	accountName				The account name/username for the
+	 *									service.
+	 *	@throws	OSXKeychainException	If an error occurs when communicating
+	 *									with the OS X keychain.
+	 */
+	public void deleteGenericPassword(String serviceName, String accountName)
+	throws OSXKeychainException
+	{
+		_deleteGenericPassword(serviceName, accountName);
+	}
+
 	/* ************************* */
 	/* JNI stuff from here down. */
 	/* ************************* */
@@ -307,6 +322,23 @@ public class OSXKeychain {
 	 *									with the OS X keychain.
 	 */
 	private native String _findInternetPassword(String serverName, String securityDomain, String accountName, String path, int port)
+	throws OSXKeychainException;
+
+	/** See Java_com_mcdermottroe_apple_OSXKeychain__1deleteGenericPassword for
+	 *	the implementation of this and use {@link #deleteGenericPassword(String,
+	 *	String)} to call this.
+	 *
+	 *	@param	serviceName				The value which should be passed as the
+	 *									serviceName parameter to
+	 *									SecKeychainFindGenericPassword in order
+	 *									to find the password to delete it.
+	 *	@param	accountName				The value for the accountName parameter
+	 *									to SecKeychainFindGenericPassword in
+	 *									order to find the password to delete it.
+	 *	@throws OSXKeychainException	If an error occurs when communicating
+	 *									with the OS X keychain.
+	 */
+	private native void _deleteGenericPassword(String serviceName, String accountName)
 	throws OSXKeychainException;
 
 	/** Load the shared object which contains the implementations for the native
@@ -412,15 +444,21 @@ public class OSXKeychain {
 
 	/** Resolve a port from either a supplied port or from a protocol.
 	 *
-	 *	@param	port
-	 *	@param	protocol
-	 *	@return
-	 *	@throws	OSXKeychainException
+	 *	@param	port					The port the protocol runs on.
+	 *	@param	protocol				A protocol constant for the given
+	 * 									protocol.
+	 *	@return							If the supplied port is a valid port
+	 *									number, then that number is returned.
+	 *									If the port is not a valid number, but
+	 *									the protocol is valid, then the port
+	 *									for that protocol is returned.
+	 *	@throws	OSXKeychainException	If port is not valid and protocol is not
+	 *									known to use a particular port.
 	 */
 	private static int getPort(int port, OSXKeychainProtocolType protocol)
 	throws OSXKeychainException
 	{
-		if (port > 0) {
+		if (port > 0 && port < 65536) {
 			return port;
 		}
 		for (Map.Entry<Integer, OSXKeychainProtocolType> entry : PROTOCOLS.entrySet()) {

@@ -317,3 +317,48 @@ JNIEXPORT jstring JNICALL Java_com_mcdermottroe_apple_OSXKeychain__1findInternet
 
 	return result;
 }
+
+/* Implementation of OSXKeychain.deleteGenericPassword(). See the Java docs for
+ * explanations of the parameters.
+ */
+JNIEXPORT void JNICALL Java_com_mcdermottroe_apple_OSXKeychain__1deleteGenericPassword(JNIEnv* env, jobject obj, jstring serviceName, jstring accountName) {
+	OSStatus status;
+	jstring_unpacked service_name;
+	jstring_unpacked account_name;
+	SecKeychainItemRef itemToDelete;
+
+	/* Unpack the params. */
+	jstring_unpack(env, serviceName, &service_name);
+	jstring_unpack(env, accountName, &account_name);
+
+	/* Query the keychain. */
+	status = SecKeychainSetPreferenceDomain(kSecPreferencesDomainUser);
+	if (status != errSecSuccess) {
+		throw_osxkeychainexception(env, status);
+		return;
+	}
+	status = SecKeychainFindGenericPassword(
+		NULL,
+		service_name.len,
+		service_name.str,
+		account_name.len,
+		account_name.str,
+		0,
+		NULL,
+		&itemToDelete
+	);
+	if (status != errSecSuccess) {
+		throw_osxkeychainexception(env, status);
+		return;
+	}
+	status = SecKeychainItemDelete(itemToDelete);
+	if (status != errSecSuccess) {
+		throw_osxkeychainexception(env, status);
+		return;
+	}
+
+	/* Clean up. */
+//	SecKeychainItemFreeContent(&itemToDelete, NULL);
+	jstring_unpacked_free(&service_name);
+	jstring_unpacked_free(&account_name);
+}
