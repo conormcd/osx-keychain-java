@@ -97,10 +97,10 @@
 		<delete dir="dist" />
 	</target>
 
-	<target name="test" depends="test-c">
+	<target name="test" depends="test-c,test-java">
 	</target>
 	<target name="test-c" depends="test-c-build">
-		<exec executable="test" dir="test/c" failonerror="true">
+		<exec executable="${basedir}/test/c/test" failonerror="true">
 		</exec>
 	</target>
 	<target name="test-c-build" depends="test-c-build-fakejni,build-javah">
@@ -128,5 +128,31 @@
 			<arg value="fakejni.o" />
 			<arg value="fakejni.c" />
 		</exec>
+	</target>
+	<target name="test-java" depends="test-java-no-junit,test-java-junit">
+	</target>
+	<target name="test-java-no-junit" unless="junit.jar">
+		<echo message="You didn't pass a value for junit.jar. Skipping JUnit tests."></echo>
+	</target>
+	<target name="test-java-junit" if="junit.jar">
+		<antcall target="dist" />
+		<antcall target="test-java-junit-build" />
+		<junit printsummary="yes" haltonfailure="yes">
+			<classpath>
+				<pathelement location="lib"/>
+				<pathelement location="${junit.jar}"/>
+			</classpath>
+
+			<batchtest todir="lib">
+				<fileset dir="test/java">
+					<include name="**/*Test.java"/>
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+	<target name="test-java-junit-build">
+		<javac destdir="lib" includeantruntime="false" debug="true" classpath="${junit.jar}">
+			<src path="test/java" />
+		</javac>
 	</target>
 </project>
