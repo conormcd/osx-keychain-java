@@ -34,24 +34,40 @@
 #define ENUM_CLASS_HEAD(file, classname) fprintf(file, "\
 package com.mcdermottroe.apple;\n\
 \n\
+/** Auto-generated from Security.h, see the Keychain Services Reference for\n\
+ *	descriptions of what these constants mean.\n\
+ */\n\
 public enum %s {\n", classname);
-#define ENUM_VALUE(file, name, value) fprintf(file, "\t" name "(\"" name "\", %d),\n", value)
-#define ENUM_VALUE_LAST(file, name, value) fprintf(file, "\t" name "(\"" name "\", %d);\n", value)
+#define ENUM_VALUE(file, name, value) fprintf(file, "\t/** " #value " */\n\t" name "(\"" name "\", %d)", value)
+#define ENUM_VALUE_DEF(file, name, value) ENUM_VALUE(file, name, value); fprintf(file, ",\n\n");
+#define ENUM_VALUE_LAST(file, name, value) ENUM_VALUE(file, name, value); fprintf(file, ";\n");
 #define ENUM_CLASS_TAIL(file, classname) fprintf(file, "\
 \n\
+\t/** The name of the constant. */\n\
 \tprivate final String symbol;\n\
 \n\
+\t/** The value of the constant. */\n\
 \tprivate final int value;\n\
 \n\
+\t/** Create the constant. \n\
+\t *\n\
+\t *\t@param sym The name of the constant.\n\
+\t *\t@param val The value of the constant.\n\
+\t */\n\
 \t" classname "(String sym, int val) {\n\
 \t\tsymbol = sym;\n\
 \t\tvalue = val;\n\
 \t}\n\
 \n\
+\t/** Get the value of the constant.\n\
+\t *\n\
+\t *\t@return	The value of the constant.\n\
+\t */\n\
 \tpublic int getValue() {\n\
 \t\treturn value;\n\
 \t}\n\
 \n\
+\t/** {@inheritDoc} */\n\
 \t@Override\n\
 \tpublic String toString() {\n\
 \t\treturn symbol;\n\
@@ -66,14 +82,14 @@ void generateOSXKeychainAuthenticationType(const char* filename) {
 	file = fopen(filename, "w");
 
 	ENUM_CLASS_HEAD(file, "OSXKeychainAuthenticationType");
-	ENUM_VALUE(file, "Any", kSecAuthenticationTypeAny);
-	ENUM_VALUE(file, "DPA", kSecAuthenticationTypeDPA);
-	ENUM_VALUE(file, "Default", kSecAuthenticationTypeDefault);
-	ENUM_VALUE(file, "HTMLForm", kSecAuthenticationTypeHTMLForm);
-	ENUM_VALUE(file, "HTTPBasic", kSecAuthenticationTypeHTTPBasic);
-	ENUM_VALUE(file, "HTTPDigest", kSecAuthenticationTypeHTTPDigest);
-	ENUM_VALUE(file, "MSN", kSecAuthenticationTypeMSN);
-	ENUM_VALUE(file, "NTLM", kSecAuthenticationTypeNTLM);
+	ENUM_VALUE_DEF(file, "Any", kSecAuthenticationTypeAny);
+	ENUM_VALUE_DEF(file, "DPA", kSecAuthenticationTypeDPA);
+	ENUM_VALUE_DEF(file, "Default", kSecAuthenticationTypeDefault);
+	ENUM_VALUE_DEF(file, "HTMLForm", kSecAuthenticationTypeHTMLForm);
+	ENUM_VALUE_DEF(file, "HTTPBasic", kSecAuthenticationTypeHTTPBasic);
+	ENUM_VALUE_DEF(file, "HTTPDigest", kSecAuthenticationTypeHTTPDigest);
+	ENUM_VALUE_DEF(file, "MSN", kSecAuthenticationTypeMSN);
+	ENUM_VALUE_DEF(file, "NTLM", kSecAuthenticationTypeNTLM);
 	ENUM_VALUE_LAST(file, "RPA", kSecAuthenticationTypeRPA);
 	ENUM_CLASS_TAIL(file, "OSXKeychainAuthenticationType");
 
@@ -87,40 +103,40 @@ void generateOSXKeychainProtocolType(const char* filename) {
 	file = fopen(filename, "w");
 
 	ENUM_CLASS_HEAD(file, "OSXKeychainProtocolType");
-	ENUM_VALUE(file, "AFP", kSecProtocolTypeAFP);
-	ENUM_VALUE(file, "Any", kSecProtocolTypeAny);
-	ENUM_VALUE(file, "AppleTalk", kSecProtocolTypeAppleTalk);
-	ENUM_VALUE(file, "CIFS", kSecProtocolTypeCIFS);
-	ENUM_VALUE(file, "CVSpserver", kSecProtocolTypeCVSpserver);
-	ENUM_VALUE(file, "DAAP", kSecProtocolTypeDAAP);
-	ENUM_VALUE(file, "EPPC", kSecProtocolTypeEPPC);
-	ENUM_VALUE(file, "FTP", kSecProtocolTypeFTP);
-	ENUM_VALUE(file, "FTPAccount", kSecProtocolTypeFTPAccount);
-	ENUM_VALUE(file, "FTPProxy", kSecProtocolTypeFTPProxy);
-	ENUM_VALUE(file, "FTPS", kSecProtocolTypeFTPS);
-	ENUM_VALUE(file, "HTTP", kSecProtocolTypeHTTP);
-	ENUM_VALUE(file, "HTTPProxy", kSecProtocolTypeHTTPProxy);
-	ENUM_VALUE(file, "HTTPS", kSecProtocolTypeHTTPS);
-	ENUM_VALUE(file, "HTTPSProxy", kSecProtocolTypeHTTPSProxy);
-	ENUM_VALUE(file, "IMAP", kSecProtocolTypeIMAP);
-	ENUM_VALUE(file, "IMAPS", kSecProtocolTypeIMAPS);
-	ENUM_VALUE(file, "IPP", kSecProtocolTypeIPP);
-	ENUM_VALUE(file, "IRC", kSecProtocolTypeIRC);
-	ENUM_VALUE(file, "IRCS", kSecProtocolTypeIRCS);
-	ENUM_VALUE(file, "LDAP", kSecProtocolTypeLDAP);
-	ENUM_VALUE(file, "LDAPS", kSecProtocolTypeLDAPS);
-	ENUM_VALUE(file, "NNTP", kSecProtocolTypeNNTP);
-	ENUM_VALUE(file, "NNTPS", kSecProtocolTypeNNTPS);
-	ENUM_VALUE(file, "POP3", kSecProtocolTypePOP3);
-	ENUM_VALUE(file, "POP3S", kSecProtocolTypePOP3S);
-	ENUM_VALUE(file, "RTSP", kSecProtocolTypeRTSP);
-	ENUM_VALUE(file, "RTSPProxy", kSecProtocolTypeRTSPProxy);
-	ENUM_VALUE(file, "SMB", kSecProtocolTypeSMB);
-	ENUM_VALUE(file, "SMTP", kSecProtocolTypeSMTP);
-	ENUM_VALUE(file, "SOCKS", kSecProtocolTypeSOCKS);
-	ENUM_VALUE(file, "SSH", kSecProtocolTypeSSH);
-	ENUM_VALUE(file, "SVN", kSecProtocolTypeSVN);
-	ENUM_VALUE(file, "Telnet", kSecProtocolTypeTelnet);
+	ENUM_VALUE_DEF(file, "AFP", kSecProtocolTypeAFP);
+	ENUM_VALUE_DEF(file, "Any", kSecProtocolTypeAny);
+	ENUM_VALUE_DEF(file, "AppleTalk", kSecProtocolTypeAppleTalk);
+	ENUM_VALUE_DEF(file, "CIFS", kSecProtocolTypeCIFS);
+	ENUM_VALUE_DEF(file, "CVSpserver", kSecProtocolTypeCVSpserver);
+	ENUM_VALUE_DEF(file, "DAAP", kSecProtocolTypeDAAP);
+	ENUM_VALUE_DEF(file, "EPPC", kSecProtocolTypeEPPC);
+	ENUM_VALUE_DEF(file, "FTP", kSecProtocolTypeFTP);
+	ENUM_VALUE_DEF(file, "FTPAccount", kSecProtocolTypeFTPAccount);
+	ENUM_VALUE_DEF(file, "FTPProxy", kSecProtocolTypeFTPProxy);
+	ENUM_VALUE_DEF(file, "FTPS", kSecProtocolTypeFTPS);
+	ENUM_VALUE_DEF(file, "HTTP", kSecProtocolTypeHTTP);
+	ENUM_VALUE_DEF(file, "HTTPProxy", kSecProtocolTypeHTTPProxy);
+	ENUM_VALUE_DEF(file, "HTTPS", kSecProtocolTypeHTTPS);
+	ENUM_VALUE_DEF(file, "HTTPSProxy", kSecProtocolTypeHTTPSProxy);
+	ENUM_VALUE_DEF(file, "IMAP", kSecProtocolTypeIMAP);
+	ENUM_VALUE_DEF(file, "IMAPS", kSecProtocolTypeIMAPS);
+	ENUM_VALUE_DEF(file, "IPP", kSecProtocolTypeIPP);
+	ENUM_VALUE_DEF(file, "IRC", kSecProtocolTypeIRC);
+	ENUM_VALUE_DEF(file, "IRCS", kSecProtocolTypeIRCS);
+	ENUM_VALUE_DEF(file, "LDAP", kSecProtocolTypeLDAP);
+	ENUM_VALUE_DEF(file, "LDAPS", kSecProtocolTypeLDAPS);
+	ENUM_VALUE_DEF(file, "NNTP", kSecProtocolTypeNNTP);
+	ENUM_VALUE_DEF(file, "NNTPS", kSecProtocolTypeNNTPS);
+	ENUM_VALUE_DEF(file, "POP3", kSecProtocolTypePOP3);
+	ENUM_VALUE_DEF(file, "POP3S", kSecProtocolTypePOP3S);
+	ENUM_VALUE_DEF(file, "RTSP", kSecProtocolTypeRTSP);
+	ENUM_VALUE_DEF(file, "RTSPProxy", kSecProtocolTypeRTSPProxy);
+	ENUM_VALUE_DEF(file, "SMB", kSecProtocolTypeSMB);
+	ENUM_VALUE_DEF(file, "SMTP", kSecProtocolTypeSMTP);
+	ENUM_VALUE_DEF(file, "SOCKS", kSecProtocolTypeSOCKS);
+	ENUM_VALUE_DEF(file, "SSH", kSecProtocolTypeSSH);
+	ENUM_VALUE_DEF(file, "SVN", kSecProtocolTypeSVN);
+	ENUM_VALUE_DEF(file, "Telnet", kSecProtocolTypeTelnet);
 	ENUM_VALUE_LAST(file, "TelnetS", kSecProtocolTypeTelnetS);
 	ENUM_CLASS_TAIL(file, "OSXKeychainProtocolType");
 
