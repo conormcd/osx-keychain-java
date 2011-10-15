@@ -85,6 +85,7 @@
 	</target>
 
 	<target name="clean">
+		<delete dir="doc" />
 		<delete dir="lib" />
 		<delete file="src/c/codegen/generate_enums" />
 		<delete file="src/c/com_mcdermottroe_apple_OSXKeychain.h" />
@@ -95,6 +96,25 @@
 	</target>
 	<target name="distclean" depends="clean">
 		<delete dir="dist" />
+	</target>
+
+	<target name="doc" depends="build">
+		<mkdir dir="doc" />
+		<javadoc
+			destdir="doc"
+			sourcepath="src/java"
+			use="true"
+		>
+			<!--
+			<doctitle><![CDATA[<h1>Test</h1>]]></doctitle>
+			<bottom><![CDATA[<i>Copyright &#169; 2000 Dummy Corp. All Rights Reserved.</i>]]></bottom>
+			<tag name="todo" scope="all" description="To do:"/>
+			<group title="Group 1 Packages" packages="com.dummy.test.a*"/>
+			<group title="Group 2 Packages" packages="com.dummy.test.b*:com.dummy.test.c*"/>
+			<link offline="true" href="http://download.oracle.com/javase/6/docs/api/" packagelistLoc="C:\tmp"/>
+			-->
+			<link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
+		</javadoc>
 	</target>
 
 	<target name="test" depends="test-c,test-java">

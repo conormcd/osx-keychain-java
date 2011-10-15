@@ -34,22 +34,34 @@ package com.mcdermottroe.apple;
 public class OSXKeychainException
 extends Exception
 {
-	/** {@inheritDoc} */
+	/** Create a blank exception with no message. */
 	public OSXKeychainException() {
 		super();
 	}
 
-	/** {@inheritDoc} */
+	/** Create an exception with a message.
+	 *
+	 *	@param	message	A message explaining why this exception must be thrown.
+	 */
 	public OSXKeychainException(String message) {
 		super(message);
 	}
 
-	/** {@inheritDoc} */
+	/** Create an exception with no message but with a link to the exception
+	 *	which caused this one to be thrown.
+	 *
+	 *	@param	cause	The reason this exception is being created and thrown.
+	 */
 	public OSXKeychainException(Throwable cause) {
 		super(cause);
 	}
 
-	/** {@inheritDoc} */
+	/** Create an exception both with a message and a link to the exceptino
+	 *	which caused this one to be thrown.
+	 *
+	 *	@param	message	A message explaining why this exception must be thrown.
+	 *	@param	cause	The reason this exception is being created and thrown.
+	 */
 	public OSXKeychainException(String message, Throwable cause) {
 		super(message, cause);
 	}
