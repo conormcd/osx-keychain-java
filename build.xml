@@ -79,9 +79,14 @@
 		</exec>
 	</target>
 
-	<target name="dist" depends="build">
+	<target name="dist" depends="build,doc">
 		<mkdir dir="dist" />
 		<jar destfile="dist/osxkeychain.jar" basedir="lib" index="true" />
+		<zip destfile="dist/osxkeychain.zip">
+			<zipfileset dir="." includes="README.md" prefix="osxkeychain" />
+			<zipfileset dir="dist" includes="osxkeychain.jar" prefix="osxkeychain" />
+			<zipfileset dir="doc" prefix="osxkeychain/doc" />
+		</zip>
 	</target>
 
 	<target name="clean">
@@ -105,14 +110,6 @@
 			sourcepath="src/java"
 			use="true"
 		>
-			<!--
-			<doctitle><![CDATA[<h1>Test</h1>]]></doctitle>
-			<bottom><![CDATA[<i>Copyright &#169; 2000 Dummy Corp. All Rights Reserved.</i>]]></bottom>
-			<tag name="todo" scope="all" description="To do:"/>
-			<group title="Group 1 Packages" packages="com.dummy.test.a*"/>
-			<group title="Group 2 Packages" packages="com.dummy.test.b*:com.dummy.test.c*"/>
-			<link offline="true" href="http://download.oracle.com/javase/6/docs/api/" packagelistLoc="C:\tmp"/>
-			-->
 			<link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
 		</javadoc>
 	</target>
