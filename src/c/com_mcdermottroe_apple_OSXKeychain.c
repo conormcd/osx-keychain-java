@@ -240,7 +240,7 @@ JNIEXPORT jstring JNICALL Java_com_mcdermottroe_apple_OSXKeychain__1findGenericP
 	);
 	if (status != errSecSuccess) {
 		throw_osxkeychainexception(env, status);
-        return NULL;
+		return NULL;
 	}
 	((char*)password)[password_length] = 0;
 
@@ -303,7 +303,7 @@ JNIEXPORT jstring JNICALL Java_com_mcdermottroe_apple_OSXKeychain__1findInternet
 	);
 	if (status != errSecSuccess) {
 		throw_osxkeychainexception(env, status);
-        return NULL;
+		return NULL;
 	}
 	((char*)password)[password_length] = 0;
 
