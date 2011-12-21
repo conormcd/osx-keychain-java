@@ -35,13 +35,20 @@
 #define jobject void*
 #define jstring char*
 #define jint int
+#define jbyte char
+#define jboolean int
+#define jsize int
 
 /* Something to use as an env* for JNI functions. */
 typedef struct {
+	void (*DeleteLocalRef)(void *env, jobject lref);
 	void* (*FindClass)(void*, const char*);
 	int (*GetStringLength)(void*, jstring);
+	const jbyte * (*GetStringUTFChars)(void*, jstring, jboolean *);
+	jsize (*GetStringUTFLength)(void *env, jstring string);
 	void (*GetStringUTFRegion)(void*, jstring, int, int, char*);
 	char* (*NewStringUTF)(void*, char*);
+	void (*ReleaseStringUTFChars)(void *env, jstring string, const char *utf);
 	void (*ThrowNew)(void*, jclass, const char*);
 } fakejni_env;
 
