@@ -157,6 +157,60 @@ JNIEXPORT void JNICALL Java_com_mcdermottroe_apple_OSXKeychain__1addGenericPassw
 	jstring_unpacked_free(env, password, &service_password);
 }
 
+JNIEXPORT void JNICALL Java_com_mcdermottroe_apple_OSXKeychain__1modifyGenericPassword(JNIEnv *env, jobject obj, jstring serviceName, jstring accountName, jstring password) {
+	OSStatus status;
+	jstring_unpacked service_name;
+	jstring_unpacked account_name;
+	jstring_unpacked service_password;
+	SecKeychainItemRef existingItem;
+
+	/* Unpack the params */
+	jstring_unpack(env, serviceName, &service_name);
+	jstring_unpack(env, accountName, &account_name);
+	jstring_unpack(env, password, &service_password);
+	/* check for allocation failures */
+	if (service_name.str == NULL || 
+	    account_name.str == NULL || 
+		service_password.str == NULL) {
+		jstring_unpacked_free(env, serviceName, &service_name);
+		jstring_unpacked_free(env, accountName, &account_name);
+		jstring_unpacked_free(env, password, &service_password);
+		return;
+	}
+
+	status = SecKeychainFindGenericPassword(
+		NULL,
+		service_name.len,
+		service_name.str,
+		account_name.len,
+		account_name.str,
+		NULL,
+		NULL,
+		&existingItem
+	);
+	if (status != errSecSuccess) {
+		throw_osxkeychainexception(env, status);
+	}
+	else {
+		/* Update the details in the keychain. */
+		status = SecKeychainItemModifyContent(
+			existingItem,
+			NULL,
+			service_password.len,
+			service_password.str
+		);
+		if (status != errSecSuccess) {
+			throw_osxkeychainexception(env, status);
+		}
+	}
+
+	/* Clean up. */
+	jstring_unpacked_free(env, serviceName, &service_name);
+	jstring_unpacked_free(env, accountName, &account_name);
+	jstring_unpacked_free(env, password, &service_password);
+}
+
+
 /* Implementation of OSXKeychain.addInternetPassword(). See the Java docs for
  * explanation of the parameters.
  */
