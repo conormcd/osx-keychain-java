@@ -71,6 +71,8 @@
 		<exec executable="src/c/codegen/generate_enums">
 			<arg value="src/java/com/mcdermottroe/apple/OSXKeychainAuthenticationType.java" />
 			<arg value="src/java/com/mcdermottroe/apple/OSXKeychainProtocolType.java" />
+			<arg value="src/java/com/mcdermottroe/apple/OSXKeychainItemType.java" />
+			<arg value="src/java/com/mcdermottroe/apple/OSXKeychainItemAttributeType.java" />
 		</exec>
 	</target>
 	<target name="codegen-generate_enums-build">
@@ -110,6 +112,8 @@
 		<delete file="src/c/codegen/generate_enums" />
 		<delete file="src/c/com_mcdermottroe_apple_OSXKeychain.h" />
 		<delete file="src/java/com/mcdermottroe/apple/OSXKeychainAuthenticationType.java" />
+		<delete file="src/java/com/mcdermottroe/apple/OSXKeychainItemAttributeType.java" />
+		<delete file="src/java/com/mcdermottroe/apple/OSXKeychainItemType.java" />
 		<delete file="src/java/com/mcdermottroe/apple/OSXKeychainProtocolType.java" />
 		<delete file="test/c/fakejni.o" />
 		<delete file="test/c/test" />
