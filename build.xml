@@ -109,6 +109,8 @@
 	<target name="clean">
 		<delete dir="doc" />
 		<delete dir="lib" />
+		<delete dir="out" />
+		<delete dir="test/junit" />
 		<delete file="src/c/codegen/generate_enums" />
 		<delete file="src/c/com_mcdermottroe_apple_OSXKeychain.h" />
 		<delete file="src/java/com/mcdermottroe/apple/OSXKeychainAuthenticationType.java" />
@@ -172,21 +174,27 @@
 	<target name="test-java-no-junit" unless="junit.jar">
 		<echo message="You didn't pass a value for junit.jar. Skipping JUnit tests."></echo>
 	</target>
-	<target name="test-java-junit" if="junit.jar">
-		<antcall target="dist" />
+	<target name="test-java-junit" depends="dist" if="junit.jar">
 		<antcall target="test-java-junit-build" />
 		<junit printsummary="yes" haltonfailure="yes">
 			<classpath>
 				<pathelement location="lib"/>
 				<pathelement location="${junit.jar}"/>
 			</classpath>
-
+			<formatter type="xml" />
 			<batchtest todir="lib">
 				<fileset dir="test/java">
 					<include name="**/*Test.java"/>
 				</fileset>
 			</batchtest>
 		</junit>
+		<mkdir dir="test/junit/results" />
+		<junitreport todir="test/junit/results">
+			<fileset dir="lib">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="frames" todir="test/junit/results" />
+		</junitreport>
 	</target>
 	<target name="test-java-junit-build">
 		<javac destdir="lib" includeantruntime="false" debug="true" classpath="${junit.jar}">
