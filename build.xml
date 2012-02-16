@@ -46,6 +46,7 @@
 		    <arg value="i386" />
 		    <arg value="-arch" />
 		    <arg value="x86_64" />
+		    <arg value="-mmacosx-version-min=10.5" />
 			<arg value="-dynamiclib" />
 			<arg value="-framework" />
 			<arg value="CoreFoundation" />
@@ -77,6 +78,7 @@
 		    <arg value="i386" />
 		    <arg value="-arch" />
 		    <arg value="x86_64" />
+		    <arg value="-mmacosx-version-min=10.5" />
 			<arg value="-framework" />
 			<arg value="Security" />
 			<arg value="-pedantic" />
