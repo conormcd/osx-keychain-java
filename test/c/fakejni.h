@@ -24,6 +24,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <sys/types.h>
+
 /* Prevent the real jni.h from being included. */
 #define _JAVASOFT_JNI_H_
 
@@ -31,23 +33,28 @@
 #define JNIEXPORT
 #define JNICALL
 #define JNIEnv fakejni_env*
-#define jclass void*
-#define jobject void*
-#define jstring char*
-#define jint int
-#define jbyte char
 #define jboolean int
-#define jsize int
+#define jbyte char
+#define jclass void*
+#define jint int
+#define jmethodID void*
+#define jobject void*
+#define jsize size_t
+#define jstring const char*
 
 /* Something to use as an env* for JNI functions. */
 typedef struct {
+	jint (*CallIntMethod)(void*, jobject, jmethodID, ...);
+	jobject (*CallObjectMethod)(void*, jobject, jmethodID, ...);
 	void (*DeleteLocalRef)(void *env, jobject lref);
-	void* (*FindClass)(void*, const char*);
-	int (*GetStringLength)(void*, jstring);
+	jclass (*FindClass)(void*, const char*);
+	jmethodID (*GetMethodID)(void*, jstring, jstring, jstring);
+	jclass (*GetObjectClass)(void*, jobject);
+	jsize (*GetStringLength)(void*, jstring);
 	const jbyte * (*GetStringUTFChars)(void*, jstring, jboolean *);
 	jsize (*GetStringUTFLength)(void *env, jstring string);
-	void (*GetStringUTFRegion)(void*, jstring, int, int, char*);
-	char* (*NewStringUTF)(void*, char*);
+	void (*GetStringUTFRegion)(void*, jstring, jsize, jsize, char*);
+	jstring (*NewStringUTF)(void*, char*);
 	void (*ReleaseStringUTFChars)(void *env, jstring string, const char *utf);
 	void (*ThrowNew)(void*, jclass, const char*);
 } fakejni_env;

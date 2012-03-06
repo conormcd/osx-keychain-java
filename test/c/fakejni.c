@@ -30,19 +30,38 @@
 
 #include "fakejni.h"
 
-void fakejni_DeleteLocalRef(void *env, jobject lref) {
+/* A replacement for JNI's (*env)->CallIntMethod. */
+jint fakejni_CallIntMethod(void* env, jobject obj, jmethodID methodID, ...) {
+	return 0;
 }
 
+/* A replacement for JNI's (*env)->CallObjectMethod. */
+jobject fakejni_CallObjectMethod(void* env, jobject obj, jmethodID methodID, ...) {
+	return (void*)"Don't use this";
+}
+
+void fakejni_DeleteLocalRef(void *env, jobject lref) {
+}
 
 /* A replacement for JNI's (*env)->FindClass. Don't use the result of this
  * function for anything, bad things will happen if you do.
  */
-void* fakejni_FindClass(void* env, const char* exceptionClass) {
+jclass fakejni_FindClass(void* env, const char* exceptionClass) {
+	return (void*)"Don't use this";
+}
+
+/* A replacement for JNI's (*env)->GetMethodID. */
+jmethodID fakejni_GetMethodID(void* env, jstring cls, jstring name, jstring sig) {
+	return 0;
+}
+
+/* A replacement for JNI's (*env)->GetObjectClass. */
+jclass fakejni_GetObjectClass(void* env, jobject obj) {
 	return (void*)"Don't use this";
 }
 
 /* A replacement for JNI's (*env)->GetStringLength. */
-int fakejni_GetStringLength(void* env, jstring str) {
+jsize fakejni_GetStringLength(void* env, jstring str) {
 	return strlen(str);
 }
 
@@ -62,7 +81,7 @@ jsize fakejni_GetStringUTFLength(void *env, jstring string) {
 }
 
 /* A replacement for JNI's (*env)->GetStringUTFRegion. */
-void fakejni_GetStringUTFRegion(void* env, jstring src, int offset, int length, char* dst) {
+void fakejni_GetStringUTFRegion(void* env, jstring src, jsize offset, jsize length, char* dst) {
 	int dstidx;
 	int srcidx;
 	for (dstidx = 0, srcidx = offset; dstidx < length; srcidx++, dstidx++) {
@@ -91,8 +110,12 @@ void fakejni_ThrowNew(void* env, jclass cls, const char* message) {
 
 /* Initialise a fakejni_env. */
 void fakejni_init(fakejni_env* env) {
+	env->CallIntMethod = &fakejni_CallIntMethod;
+	env->CallObjectMethod = &fakejni_CallObjectMethod;
 	env->DeleteLocalRef = &fakejni_DeleteLocalRef;
 	env->FindClass = &fakejni_FindClass;
+	env->GetMethodID = &fakejni_GetMethodID;
+	env->GetObjectClass = &fakejni_GetObjectClass;
 	env->GetStringLength = &fakejni_GetStringLength;
 	env->GetStringUTFRegion = &fakejni_GetStringUTFRegion;
 	env->GetStringUTFChars = &fakejni_GetStringUTFChars;
