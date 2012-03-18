@@ -28,18 +28,15 @@
  *		OSXKeychainAuthenticationType.java
  *		OSXKeychainProtocolType.java
  *		OSXKeychainItemType.java
- *		OSXKeychainItemAttributeType.java
  * which are simply mirrors of:
  *		kSecAuthenticationType*
  *		kSecProtocolType*
  *		kSec*ItemClass
- *		kSec*ItemAttr
  */
 
 #include <Security/Security.h>
 
 #include "enum_template.h"
-#include "enum_template_typed.h"
 
 /* Create OSXKeychainAuthenticationType.java. */
 void generateOSXKeychainAuthenticationType(const char* filename) {
@@ -128,62 +125,20 @@ void generateOSXKeychainItemType(const char* filename) {
 	fclose(file);
 }
 
-/* Create OSXKeychainItemAttributeType.java. */
-void generateOSXKeychainItemAttributeType(const char* filename) {
-	FILE* file;
-
-	file = fopen(filename, "w");
-
-	TYPED_ENUM_CLASS_HEAD(file, "OSXKeychainItemAttributeType", "\nimport java.util.Date;\n\n");
-	TYPED_ENUM_VALUE_DEF(file, "Account", kSecAccountItemAttr, "String.class")
-	TYPED_ENUM_VALUE_DEF(file, "Address", kSecAddressItemAttr, "String.class")
-	TYPED_ENUM_VALUE_DEF(file, "Alias", kSecAlias, "Object.class")
-	TYPED_ENUM_VALUE_DEF(file, "AuthenticationType", kSecAuthenticationTypeItemAttr, "OSXKeychainAuthenticationType.class")
-	TYPED_ENUM_VALUE_DEF(file, "CertificateEncoding", kSecCertificateEncoding, "Object.class")
-	TYPED_ENUM_VALUE_DEF(file, "CertificateType", kSecCertificateType, "Object.class")
-	TYPED_ENUM_VALUE_DEF(file, "Comment", kSecCommentItemAttr, "String.class")
-	TYPED_ENUM_VALUE_DEF(file, "CreationDate", kSecCreationDateItemAttr, "Date.class")
-	TYPED_ENUM_VALUE_DEF(file, "Creator", kSecCreatorItemAttr, "Object.class")
-	TYPED_ENUM_VALUE_DEF(file, "CrlEncoding", kSecCrlEncoding, "Object.class")
-	TYPED_ENUM_VALUE_DEF(file, "CrlType", kSecCrlType, "Object.class")
-	TYPED_ENUM_VALUE_DEF(file, "CustomIcon", kSecCustomIconItemAttr, "Object.class")
-	TYPED_ENUM_VALUE_DEF(file, "Description", kSecDescriptionItemAttr, "String.class")
-	TYPED_ENUM_VALUE_DEF(file, "Generic", kSecGenericItemAttr, "Object.class")
-	TYPED_ENUM_VALUE_DEF(file, "Invisible", kSecInvisibleItemAttr, "Boolean.class")
-	TYPED_ENUM_VALUE_DEF(file, "Label", kSecLabelItemAttr, "String.class")
-	TYPED_ENUM_VALUE_DEF(file, "ModDate", kSecModDateItemAttr, "Date.class")
-	TYPED_ENUM_VALUE_DEF(file, "Negative", kSecNegativeItemAttr, "Boolean.class")
-	TYPED_ENUM_VALUE_DEF(file, "Path", kSecPathItemAttr, "String.class")
-	TYPED_ENUM_VALUE_DEF(file, "Port", kSecPortItemAttr, "Integer.class")
-	TYPED_ENUM_VALUE_DEF(file, "Protocol", kSecProtocolItemAttr, "OSXKeychainProtocolType.class")
-	TYPED_ENUM_VALUE_DEF(file, "ScriptCode", kSecScriptCodeItemAttr, "Object.class")
-	TYPED_ENUM_VALUE_DEF(file, "SecurityDomain", kSecSecurityDomainItemAttr, "Object.class")
-	TYPED_ENUM_VALUE_DEF(file, "Server", kSecServerItemAttr, "String.class")
-	TYPED_ENUM_VALUE_DEF(file, "Service", kSecServiceItemAttr, "String.class")
-	TYPED_ENUM_VALUE_DEF(file, "Signature", kSecSignatureItemAttr, "Object.class")
-	TYPED_ENUM_VALUE_DEF(file, "Type", kSecTypeItemAttr, "Object.class")
-	TYPED_ENUM_VALUE_LAST(file, "Volume", kSecVolumeItemAttr, "String.class")
-	TYPED_ENUM_CLASS_TAIL(file, "OSXKeychainItemAttributeType");
-
-	fclose(file);
-}
-
-/* The program takes four arguments, the first is the path to
+/* The program takes three arguments, the first is the path to
  * OSXKeychainAuthenticationType.java, the second is the path to
- * OSXKeychainProtocolType.java, the third is the path to
- * OSXKeychainItemType.java and the fourth is the path to
- * OSXKeychainItemAttributeType.java.
+ * OSXKeychainProtocolType.java and the third is the path to
+ * OSXKeychainItemType.java.
  */
 int main(int argc, char** argv, char** envp) {
-	if (argc != 5) {
-		printf("Usage: %s /path/to/OSXKeychainAuthenticationType.java /path/to/OSXKeychainProtocolType.java /path/to/OSXKeychainItemType.java /path/to/OSXKeychainItemAttributeType.java\n", argv[0]);
+	if (argc != 4) {
+		printf("Usage: %s /path/to/OSXKeychainAuthenticationType.java /path/to/OSXKeychainProtocolType.java /path/to/OSXKeychainItemType.java\n", argv[0]);
 		return 1;
 	}
 
 	generateOSXKeychainAuthenticationType(argv[1]);
 	generateOSXKeychainProtocolType(argv[2]);
 	generateOSXKeychainItemType(argv[3]);
-	generateOSXKeychainItemAttributeType(argv[4]);
 
 	return 0;
 }
