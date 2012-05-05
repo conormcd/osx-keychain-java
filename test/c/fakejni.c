@@ -30,6 +30,10 @@
 
 #include "fakejni.h"
 
+void fakejni_DeleteLocalRef(void *env, jobject lref) {
+}
+
+
 /* A replacement for JNI's (*env)->FindClass. Don't use the result of this
  * function for anything, bad things will happen if you do.
  */
@@ -40,6 +44,21 @@ void* fakejni_FindClass(void* env, const char* exceptionClass) {
 /* A replacement for JNI's (*env)->GetStringLength. */
 int fakejni_GetStringLength(void* env, jstring str) {
 	return strlen(str);
+}
+
+const jbyte * fakejni_GetStringUTFChars(void*env, jstring str, jboolean *isCopy) {
+	int len = strlen(str);
+	char *utf = (char *) calloc(len+1, sizeof(char));
+	memcpy(utf, str, len*sizeof(char));
+	utf[len] = '\0';
+	if (isCopy != NULL) {
+		*isCopy = 1;
+	}
+	return utf;
+}
+
+jsize fakejni_GetStringUTFLength(void *env, jstring string) {
+	return strlen(string);
 }
 
 /* A replacement for JNI's (*env)->GetStringUTFRegion. */
@@ -53,7 +72,15 @@ void fakejni_GetStringUTFRegion(void* env, jstring src, int offset, int length, 
 
 /* A replacement for JNI's (*env)->NewStringUTF. */
 char* fakejni_NewStringUTF(void* env, char* str) {
-	return str;
+	int len = strlen(str);
+	char *utf = (char *) calloc(len+1, sizeof(char));
+	memcpy(utf, str, len*sizeof(char));
+	utf[len] = '\0';
+	return utf;
+}
+
+void fakejni_ReleaseStringUTFChars(void *env, jstring string, const char *utf) {
+	free((void *) utf);
 }
 
 /* A replacement for JNI's (*env)->ThrowNew. */
@@ -64,9 +91,13 @@ void fakejni_ThrowNew(void* env, jclass cls, const char* message) {
 
 /* Initialise a fakejni_env. */
 void fakejni_init(fakejni_env* env) {
+	env->DeleteLocalRef = &fakejni_DeleteLocalRef;
 	env->FindClass = &fakejni_FindClass;
 	env->GetStringLength = &fakejni_GetStringLength;
 	env->GetStringUTFRegion = &fakejni_GetStringUTFRegion;
+	env->GetStringUTFChars = &fakejni_GetStringUTFChars;
+	env->GetStringUTFLength = &fakejni_GetStringUTFLength;
 	env->NewStringUTF = &fakejni_NewStringUTF;
+	env->ReleaseStringUTFChars = fakejni_ReleaseStringUTFChars;
 	env->ThrowNew = &fakejni_ThrowNew;
 }

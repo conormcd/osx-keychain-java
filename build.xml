@@ -42,6 +42,11 @@
 	</target>
 	<target name="build-c" depends="build-dest,build-javah">
 		<exec executable="clang" dir="src/c">
+		    <arg value="-arch" />
+		    <arg value="i386" />
+		    <arg value="-arch" />
+		    <arg value="x86_64" />
+		    <arg value="-mmacosx-version-min=10.5" />
 			<arg value="-dynamiclib" />
 			<arg value="-framework" />
 			<arg value="CoreFoundation" />
@@ -69,6 +74,11 @@
 	</target>
 	<target name="codegen-generate_enums-build">
 		<exec executable="clang" dir="src/c/codegen">
+		    <arg value="-arch" />
+		    <arg value="i386" />
+		    <arg value="-arch" />
+		    <arg value="x86_64" />
+		    <arg value="-mmacosx-version-min=10.5" />
 			<arg value="-framework" />
 			<arg value="Security" />
 			<arg value="-pedantic" />

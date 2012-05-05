@@ -86,6 +86,22 @@ public class OSXKeychain {
 		_addGenericPassword(serviceName, accountName, password);
 	}
 
+	/** Update an existing non-internet password to the keychain.
+	 *
+	 *	@param	serviceName				The name of the service the password is
+	 *									for.
+	 *	@param	accountName				The account name/username for the
+	 *									service.
+	 *	@param	password				The password for the service.
+	 *	@throws OSXKeychainException	If an error occurs when communicating
+	 *									with the OS X keychain.
+	 */
+	public void modifyGenericPassword(String serviceName, String accountName, String password)
+	throws OSXKeychainException
+	{
+		_modifyGenericPassword(serviceName, accountName, password);
+	}
+
 	/** Add an internet password to the keychain.
 	 *
 	 *	@param	url						The URL to associate the password with.
@@ -272,6 +288,25 @@ public class OSXKeychain {
 	 *									with the OS X keychain.
 	 */
 	private native void _addGenericPassword(String serviceName, String accountName, String password)
+	throws OSXKeychainException;
+
+	/** See Java_com_mcdermottroe_apple_OSXKeychain__1modifyGenericPassword for
+	 *	the implementation of this and use {@link #modifyGenericPassword(String,
+	 *	String, String)} to call this.
+	 *
+	 *	@param	serviceName				The value which should be passed as the
+	 *									serviceName parameter to
+	 *									SecKeychainAddGenericPassword.
+	 *	@param	accountName				The value which should be passed as the
+	 *									accountName parameter to
+	 *									SecKeychainAddGenericPassword.
+	 *	@param	password				The value which should be passed as the
+	 *									password parameter to
+	 *									SecKeychainAddGenericPassword.
+	 *	@throws	OSXKeychainException	If an error occurs when communicating
+	 *									with the OS X keychain.
+	 */
+	private native void _modifyGenericPassword(String serviceName, String accountName, String password)
 	throws OSXKeychainException;
 
 	/** See Java_com_mcdermottroe_apple_OSXKeychain__1addInternetPassword for
