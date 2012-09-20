@@ -24,7 +24,7 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
  -->
-<project name="osxkeychain" default="dist" basedir=".">
+<project name="osxkeychain" default="jar" basedir=".">
 	<target name="build" depends="build-c,build-java">
 	</target>
 	<target name="build-dest">
@@ -89,9 +89,12 @@
 		</exec>
 	</target>
 
-	<target name="dist" depends="build,doc">
+	<target name="jar" depends="build">
 		<mkdir dir="dist" />
 		<jar destfile="dist/osxkeychain.jar" basedir="lib" index="true" />
+	</target>
+
+	<target name="dist" depends="jar,doc">
 		<zip destfile="dist/osxkeychain.zip">
 			<zipfileset dir="." includes="README.md" prefix="osxkeychain" />
 			<zipfileset dir="dist" includes="osxkeychain.jar" prefix="osxkeychain" />
