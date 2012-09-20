@@ -41,7 +41,7 @@
 		</javah>
 	</target>
 	<target name="build-c" depends="build-dest,build-javah">
-		<exec executable="clang" dir="src/c">
+		<exec executable="gcc" dir="src/c">
 		    <arg value="-arch" />
 		    <arg value="i386" />
 		    <arg value="-arch" />
@@ -73,7 +73,7 @@
 		</exec>
 	</target>
 	<target name="codegen-generate_enums-build">
-		<exec executable="clang" dir="src/c/codegen">
+		<exec executable="gcc" dir="src/c/codegen">
 		    <arg value="-arch" />
 		    <arg value="i386" />
 		    <arg value="-arch" />
@@ -89,7 +89,7 @@
 		</exec>
 	</target>
 
-	<target name="dist" depends="build,doc">
+	<target name="dist" depends="build">
 		<mkdir dir="dist" />
 		<jar destfile="dist/osxkeychain.jar" basedir="lib" index="true" />
 		<zip destfile="dist/osxkeychain.zip">
