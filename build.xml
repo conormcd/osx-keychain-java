@@ -56,6 +56,7 @@
 			<arg value="Security" />
 			<arg value="-I" />
 			<arg value="/System/Library/Frameworks/JavaVM.framework/Versions/Current/Headers" />
+			<arg value="-std=c99" />
 			<arg value="-pedantic" />
 			<arg value="-Wall" />
 			<arg value="-o" />
@@ -81,6 +82,7 @@
 		    <arg value="-mmacosx-version-min=10.5" />
 			<arg value="-framework" />
 			<arg value="Security" />
+			<arg value="-std=c99" />
 			<arg value="-pedantic" />
 			<arg value="-Wall" />
 			<arg value="-o" />
@@ -141,6 +143,7 @@
 			<arg value="Security" />
 			<arg value="-I" />
 			<arg value="/System/Library/Frameworks/JavaVM.framework/Versions/Current/Headers" />
+			<arg value="-std=c99" />
 			<arg value="-pedantic" />
 			<arg value="-Wall" />
 			<arg value="-o" />
@@ -151,6 +154,7 @@
 	</target>
 	<target name="test-c-build-fakejni">
 		<exec executable="gcc" dir="test/c">
+			<arg value="-std=c99" />
 			<arg value="-pedantic" />
 			<arg value="-Wall" />
 			<arg value="-c" />
